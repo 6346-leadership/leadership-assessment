@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behavioral Bridges Leadership Assessment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+        
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .assessment-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+        }
+        
+        .chart-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        
+        .bridge-item {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .bridge-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .bridge-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .bridge-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+        
+        .rating-group {
+            margin-bottom: 15px;
+        }
+        
+        .rating-label {
+            display: block;
+            font-size: 0.95em;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .rating-label.results {
+            color: #e74c3c;
+        }
+        
+        .rating-label.people {
+            color: #3498db;
+        }
+        
+        .rating-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .rating-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.2s;
+            color: #666;
+        }
+        
+        .rating-btn:hover {
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+        
+        .rating-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+        
+        .chart-legend {
+            margin-top: 20px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .results-color {
+            background: rgba(231, 76, 60, 0.6);
+            border: 2px solid rgb(231, 76, 60);
+        }
+        
+        .people-color {
+            background: rgba(52, 152, 219, 0.6);
+            border: 2px solid rgb(52, 152, 219);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+        
+        .summary {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .summary h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .summary p {
+            color: #856404;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Behavioral Bridges Leadership Assessment</h1>
+            <p>Rate yourself on each dimension to visualize your leadership profile</p>
+        </div>
+        
+        <div class="content">
+            <div class="assessment-section">
+                <div id="bridges-container"></div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showSummary()">View Summary</button>
+                    <button class="btn btn-secondary" onclick="resetAssessment()">Reset</button>
+                </div>
+                <div class="summary" id="summary"></div>
+            </div>
+            
+            <div class="chart-section">
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color results-color"></div>
+                        <span>Drive for Results</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color people-color"></div>
+                        <span>People Skills</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bridges = [
+            {
+                id: 1,
+                title: "Communicates Clear Strategy and Direction",
+                resultsDesc: "Provides clarity about direction and strategy",
+                peopleDesc: "Creates engaged team through clear communication"
+            },
+            {
+                id: 2,
+                title: "Inspires and Motivates",
+                resultsDesc: "Drives hard for results while inspiring performance",
+                peopleDesc: "Unleashes energy and creates positive environment"
+            },
+            {
+                id: 3,
+                title: "Establishes Stretch Goals",
+                resultsDesc: "Sets goals that raise the bar",
+                peopleDesc: "Collaboratively sets goals that engage the team"
+            },
+            {
+                id: 4,
+                title: "Has High Integrity and Inspires Trust",
+                resultsDesc: "Trusted motives beyond reproach",
+                peopleDesc: "Walks the talk and builds positive relationships"
+            },
+            {
+                id: 5,
+                title: "Develops Others",
+                resultsDesc: "Invests in development for productivity gains",
+                peopleDesc: "Creates engaging culture through development focus"
+            },
+            {
+                id: 6,
+                title: "Is Coachable",
+                resultsDesc: "Seeks feedback to avoid mistakes",
+                peopleDesc: "Models receptiveness and continuous improvement"
+            }
+        ];
+
+        let ratings = {};
+        bridges.forEach(bridge => {
+            ratings[bridge.id] = { results: 0, people: 0 };
+        });
+
+        let chart;
+
+        function renderBridges() {
+            const container = document.getElementById('bridges-container');
+            container.innerHTML = bridges.map(bridge => `
+                <div class="bridge-item">
+                    <div class="bridge-title">
+                        <div class="bridge-number">${bridge.id}</div>
+                        ${bridge.title}
+                    </div>
+                    
+                    <div class="rating-group">
+                        <label class="rating-label results">Drive for Results</label>
+                        <div class="rating-controls">
+                            ${[1,2,3,4,5,6,7,8,9,10].map(val => `
+                                <button class="rating-btn" 
+                                        onclick="setRating(${bridge.id}, 'results', ${val})"
+                                        data-bridge="${bridge.id}" 
+                                        data-type="results" 
+                                        data-value="${val}">
+                                    ${val}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="rating-group">
+                        <label class="rating-label people">People Skills</label>
+                        <div class="rating-controls">
+                            ${[1,2,3,4,5,6,7,8,9,10].map(val => `
+                                <button class="rating-btn" 
+                                        onclick="setRating(${bridge.id}, 'people', ${val})"
+                                        data-bridge="${bridge.id}" 
+                                        data-type="people" 
+                                        data-value="${val}">
+                                    ${val}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setRating(bridgeId, type, value) {
+            ratings[bridgeId][type] = value;
+            
+            // Update button styles
+            document.querySelectorAll(`[data-bridge="${bridgeId}"][data-type="${type}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-bridge="${bridgeId}"][data-type="${type}"][data-value="${value}"]`).classList.add('selected');
+            
+            updateChart();
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: bridges.map(b => b.title),
+                    datasets: [
+                        {
+                            label: 'Drive for Results',
+                            data: bridges.map(b => ratings[b.id].results),
+                            backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                            borderColor: 'rgb(231, 76, 60)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgb(231, 76, 60)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(231, 76, 60)',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'People Skills',
+                            data: bridges.map(b => ratings[b.id].people),
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            borderColor: 'rgb(52, 152, 219)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgb(52, 152, 219)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(52, 152, 219)',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+
+                            pointLabels: {
+                                font: {
+                                    size: 11,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            chart.data.datasets[0].data = bridges.map(b => ratings[b.id].results);
+            chart.data.datasets[1].data = bridges.map(b => ratings[b.id].people);
+            chart.update();
+        }
+
+        function showSummary() {
+            const summaryDiv = document.getElementById('summary');
+            
+            // Calculate averages
+            let totalResults = 0;
+            let totalPeople = 0;
+            let completedBridges = 0;
+            
+            bridges.forEach(bridge => {
+                if (ratings[bridge.id].results > 0 || ratings[bridge.id].people > 0) {
+                    totalResults += ratings[bridge.id].results;
+                    totalPeople += ratings[bridge.id].people;
+                    completedBridges++;
+                }
+            });
+            
+            if (completedBridges === 0) {
+                summaryDiv.innerHTML = '<h3>⚠️ No Ratings Yet</h3><p>Please rate yourself on at least one behavioral bridge to see your summary.</p>';
+                summaryDiv.style.display = 'block';
+                return;
+            }
+            
+            const avgResults = (totalResults / completedBridges).toFixed(1);
+            const avgPeople = (totalPeople / completedBridges).toFixed(1);
+            
+            // Find strengths and development areas
+            let strengths = [];
+            let developmentAreas = [];
+            
+            bridges.forEach(bridge => {
+                const resultsRating = ratings[bridge.id].results;
+                const peopleRating = ratings[bridge.id].people;
+                
+                if (resultsRating >= 8 && peopleRating >= 8) {
+                    strengths.push(bridge.title);
+                }
+                
+                if (resultsRating > 0 && resultsRating <= 4) {
+                    developmentAreas.push(`${bridge.title} (Drive for Results)`);
+                }
+                if (peopleRating > 0 && peopleRating <= 4) {
+                    developmentAreas.push(`${bridge.title} (People Skills)`);
+                }
+            });
+            
+            let summaryHTML = '<h3>📊 Your Leadership Profile Summary</h3>';
+            summaryHTML += `<p><strong>Average Drive for Results:</strong> ${avgResults}/10</p>`;
+            summaryHTML += `<p><strong>Average People Skills:</strong> ${avgPeople}/10</p>`;
+            
+            if (strengths.length > 0) {
+                summaryHTML += `<p><strong>✅ Key Strengths:</strong> ${strengths.join(', ')}</p>`;
+            }
+            
+            if (developmentAreas.length > 0) {
+                summaryHTML += `<p><strong>🎯 Development Opportunities:</strong> ${developmentAreas.join(', ')}</p>`;
+            }
+            
+            summaryDiv.innerHTML = summaryHTML;
+            summaryDiv.style.display = 'block';
+        }
+
+        function resetAssessment() {
+            if (confirm('Are you sure you want to reset all ratings?')) {
+                bridges.forEach(bridge => {
+                    ratings[bridge.id] = { results: 0, people: 0 };
+                });
+                
+                document.querySelectorAll('.rating-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                updateChart();
+                document.getElementById('summary').style.display = 'none';
+            }
+        }
+
+        // Initialize
+        renderBridges();
+        initChart();
+    </script>
+</body>
+</html>
