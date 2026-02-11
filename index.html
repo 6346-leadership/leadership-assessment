@@ -116,7 +116,7 @@
             display: block;
             font-size: 0.95em;
             color: #555;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             font-weight: 500;
         }
         
@@ -126,6 +126,14 @@
         
         .rating-label.people {
             color: #3498db;
+        }
+        
+        .rating-description {
+            font-size: 0.85em;
+            color: #777;
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.3;
         }
         
         .rating-controls {
@@ -256,7 +264,7 @@
     <div class="container">
         <div class="header">
             <h1>🎯 Behavioral Bridges Leadership Assessment</h1>
-            <p>Rate yourself on each dimension to visualize your leadership profile</p>
+            <p>Rate yourself 1-10 on each dimension to visualize your leadership profile</p>
         </div>
         
         <div class="content">
@@ -298,7 +306,7 @@
             {
                 id: 2,
                 title: "Inspires and Motivates",
-                resultsDesc: "Drives hard for results while inspiring performance",
+                resultsDesc: "Drives hard for results, pushing for high performance",
                 peopleDesc: "Unleashes energy and creates positive environment"
             },
             {
@@ -345,6 +353,7 @@
                     
                     <div class="rating-group">
                         <label class="rating-label results">Drive for Results</label>
+                        <div class="rating-description">${bridge.resultsDesc}</div>
                         <div class="rating-controls">
                             ${[1,2,3,4,5,6,7,8,9,10].map(val => `
                                 <button class="rating-btn" 
@@ -360,6 +369,7 @@
                     
                     <div class="rating-group">
                         <label class="rating-label people">People Skills</label>
+                        <div class="rating-description">${bridge.peopleDesc}</div>
                         <div class="rating-controls">
                             ${[1,2,3,4,5,6,7,8,9,10].map(val => `
                                 <button class="rating-btn" 
@@ -379,7 +389,6 @@
         function setRating(bridgeId, type, value) {
             ratings[bridgeId][type] = value;
             
-            // Update button styles
             document.querySelectorAll(`[data-bridge="${bridgeId}"][data-type="${type}"]`).forEach(btn => {
                 btn.classList.remove('selected');
             });
@@ -427,7 +436,17 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            min: 0,
+                            ticks: {
+                                stepSize: 1,
+                                font: {
+                                    size: 12
+                                }
+                            },
                             pointLabels: {
                                 font: {
                                     size: 11,
@@ -471,7 +490,6 @@
         function showSummary() {
             const summaryDiv = document.getElementById('summary');
             
-            // Calculate averages
             let totalResults = 0;
             let totalPeople = 0;
             let completedBridges = 0;
@@ -493,7 +511,6 @@
             const avgResults = (totalResults / completedBridges).toFixed(1);
             const avgPeople = (totalPeople / completedBridges).toFixed(1);
             
-            // Find strengths and development areas
             let strengths = [];
             let developmentAreas = [];
             
@@ -544,7 +561,6 @@
             }
         }
 
-        // Initialize
         renderBridges();
         initChart();
     </script>
